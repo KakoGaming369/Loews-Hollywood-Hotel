@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loews Hollywood Hotel Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #4c669f, #3b5998, #192f6a);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .form-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        .form-group input[type="number"]::-webkit-inner-spin-button, 
+        .form-group input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+        .form-footer {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .form-footer button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .form-footer button:hover {
+            background: #45a049;
+        }
+        .form-footer p {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #ff8080;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Loews Hollywood Hotel</h1>
+        <form id="bookingForm">
+            <div class="form-group">
+                <label for="orderType">Typ objednávania:</label>
+                <select id="orderType" name="orderType" required>
+                    <option value="Prenájom">Prenájom</option>
+                    <option value="Kúpa">Kúpa</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="apartmentNumber">Číslo apartmánu:</label>
+                <select id="apartmentNumber" name="apartmentNumber" required>
+                    <option value="" disabled selected>Vyberte apartmán</option>
+                    ${[...Array(35)].map((_, i) => `<option value="APT${i + 1}">APT${i + 1}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="numPeople">Ak prenájom, koľko osôb:</label>
+                <input type="number" id="numPeople" name="numPeople" min="1" step="1">
+            </div>
+            <div class="form-group">
+                <label for="numDays">Ak prenájom, na koľko dní:</label>
+                <input type="number" id="numDays" name="numDays" min="1" step="1">
+            </div>
+            <div class="form-group">
+                <label for="firstName">Meno:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Priezvisko:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="dob">Dátum narodenia:</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="idCard">Číslo ID Card:</label>
+                <input type="text" id="idCard" name="idCard" required>
+            </div>
+            <div class="form-footer">
+                <p>Po odoslaní formuláru ste povinný uhradiť sumu prenájmu/kúpy</p>
+                <button type="button" onclick="submitForm()">Odoslať</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        async function submitForm() {
+            const form = document.getElementById('bookingForm');
+            const data = new FormData(form);
+            const payload = {};
+            data.forEach((value, key) => payload[key] = value);
+
+            const webhookURL = "https://discord.com/api/webhooks/1315002072243896491/7e1zybmrAFOwlEZ2r48F8R2w-RBNTb1Bsf7E_df174Phyerrxq5PNvQvRDaqcm4-uhVO";
+            const embed = {
+                username: "Hotel Booking",
+                embeds: [{
+                    title: "Nová rezervácia",
+                    color: 3447003,
+                    fields: Object.entries(payload).map(([name, value]) => ({
+                        name: name,
+                        value: value || "N/A",
+                        inline: true
+                    }))
+                }]
+            };
+
+            try {
+                await fetch(webhookURL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(embed)
+                });
+                alert("Formulár bol úspešne odoslaný!");
+                form.reset();
+            } catch (err) {
+                console.error("Chyba pri odosielaní formuláru:", err);
+                alert("Nepodarilo sa odoslať formulár. Skúste to znova.");
+            }
+        }
+    </script>
+</body>
+</html>
